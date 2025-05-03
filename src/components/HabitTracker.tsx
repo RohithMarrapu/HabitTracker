@@ -664,15 +664,27 @@ export default function HabitTracker() {
         <button 
           id="add-habit-button"
           onClick={() => setShowAddHabit(true)}
-          className={`px-4 py-2 ${
-            theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
-            theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
-            theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
-            'bg-rose-600 hover:bg-rose-700'
-          } text-white rounded-full shadow-md flex items-center`}
+          className={`p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center ${
+            theme === 'indigo' ? 'bg-indigo-50 hover:bg-indigo-100' : 
+            theme === 'emerald' ? 'bg-emerald-50 hover:bg-emerald-100' : 
+            theme === 'amber' ? 'bg-amber-50 hover:bg-amber-100' : 
+            'bg-rose-50 hover:bg-rose-100'
+          }`}
         >
-          <Plus size={20} className="mr-1" />
-          Add New Habit
+          <div className={`h-12 w-12 rounded-full ${
+            theme === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 
+            theme === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 
+            theme === 'amber' ? 'bg-amber-100 text-amber-600' : 
+            'bg-rose-100 text-rose-600'
+          } flex items-center justify-center text-xl mb-2`}>
+            <Plus size={24} />
+          </div>
+          <span className={`font-medium ${
+            theme === 'indigo' ? 'text-indigo-600' : 
+            theme === 'emerald' ? 'text-emerald-600' : 
+            theme === 'amber' ? 'text-amber-600' : 
+            'text-rose-600'
+          }`}>New Habit</span>
         </button>
       </motion.div>
     </div>
@@ -833,15 +845,27 @@ export default function HabitTracker() {
             <button 
               id="add-habit-button"
               onClick={() => setShowAddHabit(true)}
-              className={`px-4 py-2 ${
-                theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
-                theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
-                theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
-                'bg-rose-600 hover:bg-rose-700'
-              } text-white rounded-full shadow-md flex items-center`}
+              className={`p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center ${
+                theme === 'indigo' ? 'bg-indigo-50 hover:bg-indigo-100' : 
+                theme === 'emerald' ? 'bg-emerald-50 hover:bg-emerald-100' : 
+                theme === 'amber' ? 'bg-amber-50 hover:bg-amber-100' : 
+                'bg-rose-50 hover:bg-rose-100'
+              }`}
             >
-              <Plus size={20} className="mr-1" />
-              Add New Habit
+              <div className={`h-12 w-12 rounded-full ${
+                theme === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 
+                theme === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 
+                theme === 'amber' ? 'bg-amber-100 text-amber-600' : 
+                'bg-rose-100 text-rose-600'
+              } flex items-center justify-center text-xl mb-2`}>
+                <Plus size={24} />
+              </div>
+              <span className={`font-medium ${
+                theme === 'indigo' ? 'text-indigo-600' : 
+                theme === 'emerald' ? 'text-emerald-600' : 
+                theme === 'amber' ? 'text-amber-600' : 
+                'text-rose-600'
+              }`}>New Habit</span>
             </button>
           </motion.div>
         </div>
@@ -1076,16 +1100,16 @@ export default function HabitTracker() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
-          <h3 className="text-gray-500 mb-1">Total Check-ins</h3>
+          <h3 className="text-gray-500 mb-1">This Week's Check-ins</h3>
           <p className="text-3xl font-bold">
-            {habits.reduce((total: number, habit: Habit) => total + habit.history.length, 0)}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            This week: {habits.reduce((total: number, habit: Habit) => {
+            {habits.reduce((total: number, habit: Habit) => {
               const today = new Date();
               const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
               return total + habit.history.filter(entry => new Date(entry.date) >= weekAgo).length;
             }, 0)}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Total: {habits.reduce((total: number, habit: Habit) => total + habit.history.length, 0)}
           </p>
         </motion.div>
       </div>
@@ -1850,7 +1874,7 @@ export default function HabitTracker() {
               className="bg-white rounded-xl shadow-xl w-full max-w-md"
             >
               <div className="flex justify-between items-center p-4 border-b">
-                <h2 className="text-xl font-bold">Add Reminder for {selectedHabit?.name}</h2>
+                <h2 className="text-xl font-bold">Add Reminder</h2>
                 <button 
                   onClick={() => setShowReminderModal(false)}
                   className="text-gray-500 hover:text-gray-700"
@@ -1861,6 +1885,26 @@ export default function HabitTracker() {
               
               <form onSubmit={addReminder} className="p-6">
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-gray-700 mb-1">Select Habit</label>
+                    <select 
+                      name="habitId"
+                      required
+                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      onChange={(e) => {
+                        const habit = habits.find(h => h.id === e.target.value);
+                        if (habit) setSelectedHabit(habit);
+                      }}
+                    >
+                      <option value="">Select a habit</option>
+                      {habits.map(habit => (
+                        <option key={habit.id} value={habit.id}>
+                          {habit.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
                   <div>
                     <label className="block text-gray-700 mb-1">Time</label>
                     <input 
@@ -1882,7 +1926,12 @@ export default function HabitTracker() {
                   </button>
                   <button 
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    className={`px-4 py-2 ${
+                      theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
+                      theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
+                      theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
+                      'bg-rose-600 hover:bg-rose-700'
+                    } text-white rounded-lg`}
                   >
                     Add Reminder
                   </button>
