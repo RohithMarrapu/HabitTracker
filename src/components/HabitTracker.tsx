@@ -380,8 +380,8 @@ export default function HabitTracker() {
   
   // Update the updateHabitValue function to handle different units properly
   const updateHabitValue = (id: string, value: number) => {
-    setHabits(prevHabits => 
-      prevHabits.map(habit => {
+    setHabits(prevHabits => {
+      const updatedHabits = prevHabits.map(habit => {
         if (habit.id === id) {
           // Get current date in YYYY-MM-DD format
           const today = new Date().toISOString().split('T')[0];
@@ -432,8 +432,18 @@ export default function HabitTracker() {
           };
         }
         return habit;
-      })
-    );
+      });
+
+      // Update selected habit if it's the one being modified
+      if (selectedHabit && selectedHabit.id === id) {
+        const updatedSelectedHabit = updatedHabits.find(h => h.id === id);
+        if (updatedSelectedHabit) {
+          setSelectedHabit(updatedSelectedHabit);
+        }
+      }
+
+      return updatedHabits;
+    });
   };
   
   // Update the addReminder function
@@ -1005,58 +1015,55 @@ export default function HabitTracker() {
       
       <div className="mt-6">
         <p className="text-gray-600 mb-3">Update today's value</p>
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => {
+                const newValue = Math.max(0, habit.currentValue - (habit.unit === 'steps' ? 1000 : 1));
+                updateHabitValue(habit.id, newValue);
+              }}
+              className={`h-10 w-10 rounded-full ${
+                theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
+                theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
+                theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
+                'bg-rose-100 text-rose-600 hover:bg-rose-200'
+              } flex items-center justify-center text-xl`}
+            >
+              -
+            </button>
+            <p className="text-center text-2xl font-bold">
+              {habit.currentValue} <span className="text-gray-500 text-base font-normal">{habit.unit}</span>
+            </p>
+            <button 
+              onClick={() => {
+                const newValue = habit.currentValue + (habit.unit === 'steps' ? 1000 : 1);
+                updateHabitValue(habit.id, newValue);
+              }}
+              className={`h-10 w-10 rounded-full ${
+                theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
+                theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
+                theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
+                'bg-rose-100 text-rose-600 hover:bg-rose-200'
+              } flex items-center justify-center text-xl`}
+            >
+              +
+            </button>
+          </div>
           <button 
             onClick={() => {
               const newValue = Math.max(0, habit.currentValue - (habit.unit === 'steps' ? 1000 : 1));
               updateHabitValue(habit.id, newValue);
             }}
-            className={`h-10 w-10 rounded-full ${
-              theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
-              theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
-              theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
-              'bg-rose-100 text-rose-600 hover:bg-rose-200'
-            } flex items-center justify-center text-xl`}
+            className={`px-4 py-2 rounded-lg ${
+              theme === 'indigo' ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 
+              theme === 'emerald' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 
+              theme === 'amber' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 
+              'bg-rose-50 text-rose-600 hover:bg-rose-100'
+            }`}
           >
-            -
-          </button>
-          <div className="flex-1 mx-4">
-            <input 
-              type="range" 
-              min="0" 
-              max={habit.unit === 'steps' ? "20000" : "24"}
-              step={habit.unit === 'steps' ? "100" : "0.1"}
-              value={habit.currentValue}
-              onChange={(e) => {
-                const newValue = parseFloat(e.target.value);
-                updateHabitValue(habit.id, newValue);
-              }}
-              className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer ${
-                theme === 'indigo' ? 'accent-indigo-600' : 
-                theme === 'emerald' ? 'accent-emerald-600' : 
-                theme === 'amber' ? 'accent-amber-600' : 
-                'accent-rose-600'
-              }`}
-            />
-          </div>
-          <button 
-            onClick={() => {
-              const newValue = habit.currentValue + (habit.unit === 'steps' ? 1000 : 1);
-              updateHabitValue(habit.id, newValue);
-            }}
-            className={`h-10 w-10 rounded-full ${
-              theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
-              theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
-              theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
-              'bg-rose-100 text-rose-600 hover:bg-rose-200'
-            } flex items-center justify-center text-xl`}
-          >
-            +
+            Undo Last Check-in
           </button>
         </div>
-        <p className="text-center mt-2 text-2xl font-bold">
-          {habit.currentValue} <span className="text-gray-500 text-base font-normal">{habit.unit}</span>
-        </p>
       </div>
       
       <div className="mt-6">
