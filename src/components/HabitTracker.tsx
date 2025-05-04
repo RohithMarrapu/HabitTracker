@@ -15,7 +15,7 @@ import {
   Cell,
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Plus, Search, Settings, Home, BarChart2, CheckCircle, X, ChevronLeft, Trash2 } from 'lucide-react';
+import { Bell, Plus, Search, Settings, Home, BarChart2, CheckCircle, X, ChevronLeft, Trash2, LogOut } from 'lucide-react';
 
 // Constants
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
@@ -292,11 +292,23 @@ export default function HabitTracker() {
   });
   const [theme, setTheme] = useState<Theme>('indigo');
   const [tempTheme, setTempTheme] = useState<Theme>(theme);
+  const [tempName, setTempName] = useState<string>(user.name);
+  const [isSaveDisabled, setIsSaveDisabled] = useState<boolean>(false);
+  const [showNotificationPopup, setShowNotificationPopup] = useState<boolean>(false);
+  const [notificationMessage, setNotificationMessage] = useState<string>('');
+  const [showStatusPopup, setShowStatusPopup] = useState<boolean>(false);
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [showDeletePopup, setShowDeletePopup] = useState<boolean>(false);
+  const [showAllHabits, setShowAllHabits] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLogoutPopup, setShowLogoutPopup] = useState<boolean>(false);
   
   // Refs for click outside detection
   const notificationRef = useRef<HTMLDivElement>(null);
   const habitModalRef = useRef<HTMLDivElement>(null);
   const reminderModalRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   
   // Click outside handlers
   useEffect(() => {
@@ -323,6 +335,14 @@ export default function HabitTracker() {
         !(event.target as Element).closest('#reminder-button')
       ) {
         setShowReminderModal(false);
+      }
+
+      if (
+        profileMenuRef.current && 
+        !profileMenuRef.current.contains(event.target as Node) &&
+        !(event.target as Element).closest('#profile-button')
+      ) {
+        setShowProfileMenu(false);
       }
     }
     
@@ -457,30 +477,19 @@ export default function HabitTracker() {
   };
   
   // Delete habit
-  const deleteHabit = (id: string) => {
-    setHabits(prevHabits => prevHabits.filter(habit => habit.id !== id));
-    
-    // Remove associated reminders
-    setReminders(prevReminders => prevReminders.filter(reminder => reminder.habitId !== id));
-    
-    // Close detail view if open
-    if (selectedHabit && selectedHabit.id === id) {
-      setSelectedHabit(null);
-    }
+  const deleteHabit = (habit: Habit) => {
+    setHabits(prevHabits => prevHabits.filter(h => h.id !== habit.id));
+    setHabitToDelete(null);
     
     // Add notification
-    const habit = habits.find(h => h.id === id);
-    if (habit) {
-      const newNotification: Notification = {
-        id: String(Date.now()),
-        title: 'Habit deleted',
-        message: `You've deleted the habit: ${habit.name}`,
-        time: 'just now',
-        read: false
-      };
-      
-      setNotifications(prev => [newNotification, ...prev]);
-    }
+    const newNotification: Notification = {
+      id: String(Date.now()),
+      title: 'Habit deleted',
+      message: `You've deleted the habit: ${habit.name}`,
+      time: 'just now',
+      read: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
   };
   
   // Calculate completion percentages
@@ -723,7 +732,7 @@ export default function HabitTracker() {
             </button>
             <h2 className="text-xl font-bold">{selectedHabit.icon} {selectedHabit.name}</h2>
             <button 
-              onClick={() => deleteHabit(selectedHabit.id)}
+              onClick={() => deleteHabit(selectedHabit)}
               className="text-red-500 hover:text-red-700"
             >
               <Trash2 size={24} />
@@ -769,7 +778,7 @@ export default function HabitTracker() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white p-4 rounded-xl shadow-md cursor-pointer"
+                    className="bg-white p-4 rounded-xl shadow-md cursor-pointer relative group"
                     onClick={() => setSelectedHabit(habit)}
                   >
                     <div className="flex justify-between items-center mb-3">
@@ -780,12 +789,17 @@ export default function HabitTracker() {
                           <p className="text-gray-500 text-sm">{habit.target} {habit.unit} daily</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">{completion}%</span>
-                        <div className="flex items-center text-sm">
-                          <span className="text-orange-500">🔥</span>
-                          <span className="ml-1">{habit.streak} days</span>
-                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHabitToDelete(habit);
+                          }}
+                          className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-100 text-gray-400 hover:text-red-500"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
                     
@@ -1184,53 +1198,57 @@ export default function HabitTracker() {
       >
         <h3 className="text-lg font-semibold mb-4">Habit Breakdown</h3>
         <div className="space-y-6">
-          {/* Sleep */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium flex items-center">
-                <span className="text-xl mr-2">😴</span> Sleep
-              </h4>
-              <span className="text-sm text-gray-500">Target: 8 hours</span>
+          {habits.slice(0, showAllHabits ? habits.length : 2).map((habit) => (
+            <div key={habit.id}>
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium flex items-center">
+                  <span className="text-xl mr-2">{habit.icon}</span> {habit.name}
+                </h4>
+                <span className="text-sm text-gray-500">Target: {habit.target} {habit.unit}</span>
+              </div>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={habit.history}
+                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="date" 
+                      tickFormatter={(value: string) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString('en-US', { weekday: 'short' });
+                      }}
+                    />
+                    <YAxis />
+                    <Tooltip 
+                      formatter={(value: number) => [`${value} ${habit.unit}`, habit.name]}
+                      labelFormatter={(label: string) => {
+                        const date = new Date(label);
+                        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                      }}
+                    />
+                    <Bar dataKey="value" name={habit.name} fill={habit.color} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={analytics.sleep}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `${value} hours`} />
-                  <Bar dataKey="hours" name="Sleep Duration" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          
-          {/* Water */}
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium flex items-center">
-                <span className="text-xl mr-2">💧</span> Water
-              </h4>
-              <span className="text-sm text-gray-500">Target: 8 glasses</span>
-            </div>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={analytics.water}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => `${value} glasses`} />
-                  <Bar dataKey="glasses" name="Water Intake" fill="#82ca9d" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          ))}
+          {habits.length > 2 && (
+            <motion.button
+              onClick={() => setShowAllHabits(!showAllHabits)}
+              className={`w-full py-2 rounded-lg ${
+                theme === 'indigo' ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 
+                theme === 'emerald' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 
+                theme === 'amber' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 
+                'bg-rose-50 text-rose-600 hover:bg-rose-100'
+              }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {showAllHabits ? 'Show Less' : `Show More (${habits.length - 2} more)`}
+            </motion.button>
+          )}
         </div>
       </motion.div>
     </div>
@@ -1282,8 +1300,8 @@ export default function HabitTracker() {
               <label className="block text-gray-700 mb-1">Display Name</label>
               <input 
                 type="text" 
-                value={user.name}
-                onChange={(e) => setUser(prev => ({...prev, name: e.target.value}))}
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
@@ -1368,18 +1386,10 @@ export default function HabitTracker() {
           
           <div className="mt-6">
             <button 
-              onClick={() => {
-                setTheme(tempTheme);
-                const newNotification: Notification = {
-                  id: String(Date.now()),
-                  title: 'Settings saved',
-                  message: 'Your account settings have been updated successfully',
-                  time: 'just now',
-                  read: false
-                };
-                setNotifications(prev => [newNotification, ...prev]);
-              }}
+              onClick={handleSaveChanges}
+              disabled={isSaveDisabled}
               className={`px-4 py-2 ${
+                isSaveDisabled ? 'bg-gray-400 cursor-not-allowed' :
                 theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
                 theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
                 theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
@@ -1469,7 +1479,6 @@ export default function HabitTracker() {
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Data Management</h3>
           <div className="space-y-4">
             <button 
               onClick={exportData}
@@ -1482,7 +1491,15 @@ export default function HabitTracker() {
             </button>
             
             <button 
-              onClick={deleteAccount}
+              onClick={() => setShowLogoutPopup(true)}
+              className="w-full p-3 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 flex items-center justify-center"
+            >
+              <LogOut className="h-5 w-5 mr-2" />
+              Logout
+            </button>
+            
+            <button 
+              onClick={() => setShowDeletePopup(true)}
               className="w-full p-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 flex items-center justify-center"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1512,7 +1529,7 @@ export default function HabitTracker() {
     const newHabit: Habit = {
       id: String(Date.now()),
       name: formData.get('name') as string,
-      icon: formData.get('icon') as string,
+      icon: formData.get('icon') as string || '😊', // Default to smiley if no icon provided
       target: Number(formData.get('target')),
       unit: formData.get('unit') as string,
       currentValue: 0,
@@ -1565,25 +1582,75 @@ export default function HabitTracker() {
   };
 
   const deleteAccount = () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      // In a real app, this would make an API call to delete the account
-      // For now, we'll just reset the state
-      setUser(initialUser);
-      setHabits(initialHabits);
-      setAnalytics(initialAnalytics);
-      setReminders(initialReminders);
-      setNotifications([]);
-      
-      // Add notification
-      const newNotification: Notification = {
-        id: String(Date.now()),
-        title: 'Account deleted',
-        message: 'Your account has been deleted successfully',
-        time: 'just now',
-        read: false
-      };
-      setNotifications(prev => [newNotification, ...prev]);
+    // In a real app, this would make an API call to delete the account
+    // For now, we'll just reset the state
+    setUser(initialUser);
+    setHabits(initialHabits);
+    setAnalytics(initialAnalytics);
+    setReminders(initialReminders);
+    setNotifications([]);
+    
+    // Add notification
+    const newNotification: Notification = {
+      id: String(Date.now()),
+      title: 'Account deleted',
+      message: 'Your account has been deleted successfully',
+      time: 'just now',
+      read: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+    setShowDeletePopup(false);
+  };
+  
+  const handleSaveChanges = () => {
+    setTheme(tempTheme);
+    setUser(prev => ({...prev, name: tempName}));
+    
+    // Check notification changes and show appropriate message
+    let message = '';
+    if (!emailNotifications.dailyDigest && !emailNotifications.reminders) {
+      message = 'Both daily digest and reminder notifications have been disabled';
+    } else if (!emailNotifications.dailyDigest) {
+      message = 'Daily digest notifications have been disabled';
+    } else if (!emailNotifications.reminders) {
+      message = 'Reminder notifications have been disabled';
+    } else {
+      message = 'All notification settings have been saved';
     }
+    
+    setStatusMessage(message);
+    setShowStatusPopup(true);
+    window.setTimeout(() => setShowStatusPopup(false), 5000);
+    
+    const newNotification: Notification = {
+      id: String(Date.now()),
+      title: 'Settings saved',
+      message: 'Your account settings have been updated successfully',
+      time: 'just now',
+      read: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+  };
+
+  const logout = () => {
+    // In a real app, this would make an API call to logout
+    // For now, we'll just reset the state
+    setUser(initialUser);
+    setHabits(initialHabits);
+    setAnalytics(initialAnalytics);
+    setReminders(initialReminders);
+    setNotifications([]);
+    
+    // Add notification
+    const newNotification: Notification = {
+      id: String(Date.now()),
+      title: 'Logged out',
+      message: 'You have been logged out successfully',
+      time: 'just now',
+      read: false
+    };
+    setNotifications(prev => [newNotification, ...prev]);
+    setShowLogoutPopup(false);
   };
   
   return (
@@ -1614,12 +1681,70 @@ export default function HabitTracker() {
                   <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full"></span>
                 )}
               </button>
-              <img 
-                src={user.avatar} 
-                alt={user.name} 
-                className="h-8 w-8 rounded-full cursor-pointer"
-                onClick={() => setActiveTab('settings')}
-              />
+              <div className="relative">
+                <button 
+                  id="profile-button"
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  className="flex items-center focus:outline-none"
+                >
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name} 
+                    className="h-8 w-8 rounded-full border-2 border-gray-200"
+                  />
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                <AnimatePresence>
+                  {showProfileMenu && (
+                    <motion.div
+                      ref={profileMenuRef}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50"
+                    >
+                      <div className="px-4 py-2 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">Level {user.level}</p>
+                      </div>
+                      <div className="py-1">
+                        <button
+                          onClick={() => {
+                            setActiveTab('settings');
+                            setShowProfileMenu(false);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                          <Settings size={16} className="mr-3" />
+                          Settings
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveTab('analytics');
+                            setShowProfileMenu(false);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                          <BarChart2 size={16} className="mr-3" />
+                          Analytics
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowLogoutPopup(true);
+                            setShowProfileMenu(false);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <LogOut size={16} className="mr-3" />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </div>
@@ -1756,6 +1881,21 @@ export default function HabitTracker() {
                 ))
               )}
             </div>
+            {notifications.length > 0 && (
+              <div className="p-4 border-t border-gray-200">
+                <button 
+                  onClick={() => setNotifications([])}
+                  className={`w-full py-2 text-sm font-medium ${
+                    tempTheme === 'indigo' ? 'text-red-600 hover:text-red-800' : 
+                    tempTheme === 'emerald' ? 'text-red-600 hover:text-red-800' : 
+                    tempTheme === 'amber' ? 'text-red-600 hover:text-red-800' : 
+                    'text-red-600 hover:text-red-800'
+                  }`}
+                >
+                  Delete all notifications
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -1800,12 +1940,11 @@ export default function HabitTracker() {
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 mb-1">Icon</label>
+                    <label className="block text-gray-700 mb-1">Icon (optional)</label>
                     <input 
                       type="text" 
                       name="icon"
-                      required
-                      placeholder="e.g., 🧘"
+                      placeholder="e.g., 🧘 (leave empty for default)"
                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
@@ -1937,6 +2076,208 @@ export default function HabitTracker() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Notification Popup */}
+      <AnimatePresence>
+        {showNotificationPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900">Notifications Disabled</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  You have disabled all email notifications. The save button will be available in a few seconds.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Status Popup */}
+      <AnimatePresence>
+        {showStatusPopup && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-gray-500">
+                  {statusMessage}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Delete Account Popup */}
+      <AnimatePresence>
+        {showDeletePopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl shadow-xl w-full max-w-md"
+            >
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-lg font-medium text-gray-900">Delete Account</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Are you sure you want to delete your account? This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowDeletePopup(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={deleteAccount}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Delete Habit Popup */}
+      <AnimatePresence>
+        {habitToDelete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden"
+            >
+              <div className="p-6">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center">
+                      <Trash2 className="h-5 w-5 text-red-500" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Delete Habit</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Are you sure you want to delete "{habitToDelete.name}"? This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setHabitToDelete(null)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => deleteHabit(habitToDelete)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete Habit
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Logout Popup */}
+      <AnimatePresence>
+        {showLogoutPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl shadow-xl w-full max-w-md"
+            >
+              <div className="p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-lg font-medium text-gray-900">Logout</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Are you sure you want to logout? Your session will be ended.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowLogoutPopup(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
