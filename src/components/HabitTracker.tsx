@@ -15,7 +15,7 @@ import {
   Cell,
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Plus, Search, Settings, Home, BarChart2, CheckCircle, X, ChevronLeft, Trash2, LogOut } from 'lucide-react';
+import { Bell, Plus, Search, Settings, Home, BarChart2, CheckCircle, X, ChevronLeft, Trash2, LogOut, ArrowRight, CheckCircle2, Calendar, Target, Trophy } from 'lucide-react';
 
 // Constants
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
@@ -40,6 +40,10 @@ type User = {
   streakDays: number;
   totalCompletions: number;
   level: number;
+  emailNotifications: {
+    dailyDigest: boolean;
+    reminders: boolean;
+  };
 };
 
 type AnalyticsData = {
@@ -75,6 +79,10 @@ const initialUser: User = {
   streakDays: 28,
   totalCompletions: 257,
   level: 8,
+  emailNotifications: {
+    dailyDigest: true,
+    reminders: true
+  },
 };
 
 const initialHabits: Habit[] = [
@@ -273,6 +281,146 @@ const initialReminders: Reminder[] = [
   { id: '4', habitId: '4', time: '18:00', active: false },
 ];
 
+// Add new component before the main HabitTracker component
+const LandingPage = ({ setActiveTab }: { setActiveTab: (tab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing') => void }) => {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            Build Better Habits,<br />
+            <span className="text-indigo-600">One Day at a Time</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Track your daily habits, monitor your progress, and achieve your goals with our intuitive habit tracking app.
+          </p>
+          <div className="flex justify-center gap-4">
+            <button 
+              onClick={() => setActiveTab('dashboard')}
+              className="px-8 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+            >
+              Get Started
+              <ArrowRight size={20} />
+            </button>
+            <button 
+              onClick={() => setActiveTab('analytics')}
+              className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-indigo-600 flex items-center gap-2"
+            >
+              View Analytics
+              <BarChart2 size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-white py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            Why Choose Our Habit Tracker?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                <Target className="h-6 w-6 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Goal Tracking</h3>
+              <p className="text-gray-600">
+                Set and track your daily goals with our intuitive interface. Monitor your progress and stay motivated.
+              </p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                <BarChart2 className="h-6 w-6 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Detailed Analytics</h3>
+              <p className="text-gray-600">
+                Get insights into your habits with comprehensive analytics and progress tracking.
+              </p>
+            </div>
+            <div className="p-6 bg-gray-50 rounded-xl">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                <Bell className="h-6 w-6 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Smart Reminders</h3>
+              <p className="text-gray-600">
+                Never miss a habit with customizable reminders and notifications.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works Section */}
+      <div className="py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            How It Works
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-indigo-600 font-bold">1</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Add Habits</h3>
+              <p className="text-gray-600">
+                Create your habits with custom targets and units
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-indigo-600 font-bold">2</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Track Daily</h3>
+              <p className="text-gray-600">
+                Log your progress each day
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-indigo-600 font-bold">3</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Monitor Progress</h3>
+              <p className="text-gray-600">
+                View your analytics and streaks
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-indigo-600 font-bold">4</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Achieve Goals</h3>
+              <p className="text-gray-600">
+                Build lasting habits and reach your targets
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="bg-indigo-600 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Build Better Habits?
+          </h2>
+          <p className="text-xl text-indigo-100 mb-8">
+            Start your journey to a better you today.
+          </p>
+          <button 
+            onClick={() => setActiveTab('dashboard')}
+            className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+          >
+            Get Started Now
+            <ArrowRight size={20} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function HabitTracker() {
   // State
   const [user, setUser] = useState<User>(initialUser);
@@ -280,7 +428,7 @@ export default function HabitTracker() {
   const [analytics, setAnalytics] = useState<AnalyticsData>(initialAnalytics);
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'habits' | 'analytics' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing'>('landing');
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
@@ -1715,21 +1863,27 @@ export default function HabitTracker() {
     setTheme(tempTheme);
     setUser(prev => ({...prev, name: tempName}));
     
-    // Check notification changes and show appropriate message
-    let message = '';
-    if (!emailNotifications.dailyDigest && !emailNotifications.reminders) {
-      message = 'Both daily digest and reminder notifications have been disabled';
-    } else if (!emailNotifications.dailyDigest) {
-      message = 'Daily digest notifications have been disabled';
-    } else if (!emailNotifications.reminders) {
-      message = 'Reminder notifications have been disabled';
-    } else {
-      message = 'All notification settings have been saved';
-    }
+    // Check if there are any changes to email notifications
+    const hasEmailChanges = emailNotifications.dailyDigest !== initialUser.emailNotifications.dailyDigest ||
+                          emailNotifications.reminders !== initialUser.emailNotifications.reminders;
     
-    setStatusMessage(message);
-    setShowStatusPopup(true);
-    window.setTimeout(() => setShowStatusPopup(false), 5000);
+    // Only show status message if there are changes to email notifications
+    if (hasEmailChanges) {
+      let message = '';
+      if (!emailNotifications.dailyDigest && !emailNotifications.reminders) {
+        message = 'Both daily digest and reminder notifications have been disabled';
+      } else if (!emailNotifications.dailyDigest) {
+        message = 'Daily digest notifications have been disabled';
+      } else if (!emailNotifications.reminders) {
+        message = 'Reminder notifications have been disabled';
+      } else {
+        message = 'All notification settings have been saved';
+      }
+      
+      setStatusMessage(message);
+      setShowStatusPopup(true);
+      window.setTimeout(() => setShowStatusPopup(false), 5000);
+    }
     
     const newNotification: Notification = {
       id: String(Date.now()),
@@ -1764,633 +1918,720 @@ export default function HabitTracker() {
   
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className={`text-xl font-bold ${
-              tempTheme === 'indigo' ? 'text-indigo-600' : 
-              tempTheme === 'emerald' ? 'text-emerald-600' : 
-              tempTheme === 'amber' ? 'text-amber-600' : 
-              'text-rose-600'
-            }`}>HabitTracker</h1>
-            <div className="flex items-center space-x-4">
-              <button 
-                id="notification-button"
-                onClick={() => setShowNotifications(!showNotifications)}
-                className={`relative p-2 text-gray-600 ${
-                  tempTheme === 'indigo' ? 'hover:text-indigo-600' : 
-                  tempTheme === 'emerald' ? 'hover:text-emerald-600' : 
-                  tempTheme === 'amber' ? 'hover:text-amber-600' : 
-                  'hover:text-rose-600'
-                } focus:outline-none`}
-              >
-                <Bell size={24} />
-                {notifications.some(n => !n.read) && (
-                  <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full"></span>
-                )}
-              </button>
-              <div className="relative">
-                <button 
-                  id="profile-button"
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center focus:outline-none"
-                >
-                  <img 
-                    src={user.avatar} 
-                    alt={user.name} 
-                    className="h-8 w-8 rounded-full border-2 border-gray-200"
-                  />
-                </button>
-
-                {/* Profile Dropdown Menu */}
-                <AnimatePresence>
-                  {showProfileMenu && (
-                    <motion.div
-                      ref={profileMenuRef}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50"
-                    >
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                        <p className="text-xs text-gray-500">Level {user.level}</p>
-                      </div>
-                      <div className="py-1">
-                        <button
-                          onClick={() => {
-                            setActiveTab('settings');
-                            setShowProfileMenu(false);
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          <Settings size={16} className="mr-3" />
-                          Settings
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTab('analytics');
-                            setShowProfileMenu(false);
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                        >
-                          <BarChart2 size={16} className="mr-3" />
-                          Analytics
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowLogoutPopup(true);
-                            setShowProfileMenu(false);
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                        >
-                          <LogOut size={16} className="mr-3" />
-                          Logout
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto pb-20">
-        <AnimatePresence mode="wait">
-          {activeTab === 'dashboard' && renderDashboard()}
-          {activeTab === 'habits' && renderHabits()}
-          {activeTab === 'analytics' && renderAnalytics()}
-          {activeTab === 'settings' && renderSettings()}
-        </AnimatePresence>
-      </main>
-      
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-around">
-            <button 
-              onClick={() => setActiveTab('dashboard')}
-              className={`flex flex-col items-center py-3 px-6 ${
-                activeTab === 'dashboard' ? 
-                (tempTheme === 'indigo' ? 'text-indigo-600' : 
-                 tempTheme === 'emerald' ? 'text-emerald-600' : 
-                 tempTheme === 'amber' ? 'text-amber-600' : 
-                 'text-rose-600') : 
-                'text-gray-500'
-              }`}
-            >
-              <Home size={24} />
-              <span className="text-xs mt-1">Home</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab('habits')}
-              className={`flex flex-col items-center py-3 px-6 ${activeTab === 'habits' ? 'text-indigo-600' : 'text-gray-500'}`}
-            >
-              <CheckCircle size={24} />
-              <span className="text-xs mt-1">Habits</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab('analytics')}
-              className={`flex flex-col items-center py-3 px-6 ${activeTab === 'analytics' ? 'text-indigo-600' : 'text-gray-500'}`}
-            >
-              <BarChart2 size={24} />
-              <span className="text-xs mt-1">Analytics</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab('settings')}
-              className={`flex flex-col items-center py-3 px-6 ${activeTab === 'settings' ? 'text-indigo-600' : 'text-gray-500'}`}
-            >
-              <Settings size={24} />
-              <span className="text-xs mt-1">Settings</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-      
-      {/* Notifications Panel */}
-      <AnimatePresence>
-        {showNotifications && (
-          <motion.div 
-            ref={notificationRef}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-16 right-4 w-80 bg-white rounded-xl shadow-xl z-50 overflow-hidden"
-          >
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <h3 className="font-semibold">Notifications</h3>
-                <button 
-                  onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
-                  className={`text-sm ${
-                    tempTheme === 'indigo' ? 'text-indigo-600 hover:text-indigo-800' : 
-                    tempTheme === 'emerald' ? 'text-emerald-600 hover:text-emerald-800' : 
-                    tempTheme === 'amber' ? 'text-amber-600 hover:text-amber-800' : 
-                    'text-rose-600 hover:text-rose-800'
-                  }`}
-                >
-                  Mark all as read
-                </button>
-              </div>
-            </div>
-            <div className="max-h-96 overflow-y-auto">
-              {notifications.length === 0 ? (
-                <p className="text-gray-500 text-center py-6">No notifications</p>
-              ) : (
-                notifications.map(notification => (
-                  <div 
-                    key={notification.id}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                      !notification.read ? 
-                      (theme === 'indigo' ? 'bg-indigo-50' : 
-                       theme === 'emerald' ? 'bg-emerald-50' : 
-                       theme === 'amber' ? 'bg-amber-50' : 
-                       'bg-rose-50') : 
-                      ''
-                    }`}
+      {activeTab === 'landing' ? (
+        <LandingPage setActiveTab={setActiveTab} />
+      ) : (
+        <>
+          {/* Header */}
+          <header className="bg-white shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center py-4">
+                <h1 className={`text-xl font-bold ${
+                  tempTheme === 'indigo' ? 'text-indigo-600' : 
+                  tempTheme === 'emerald' ? 'text-emerald-600' : 
+                  tempTheme === 'amber' ? 'text-amber-600' : 
+                  'text-rose-600'
+                }`}>HabitTracker</h1>
+                <div className="flex items-center space-x-4">
+                  <button 
+                    id="notification-button"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className={`relative p-2 text-gray-600 ${
+                      tempTheme === 'indigo' ? 'hover:text-indigo-600' : 
+                      tempTheme === 'emerald' ? 'hover:text-emerald-600' : 
+                      tempTheme === 'amber' ? 'hover:text-amber-600' : 
+                      'hover:text-rose-600'
+                    } focus:outline-none`}
                   >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium">{notification.title}</h4>
-                            {!notification.read && (
-                              <span className={`h-2 w-2 ${
-                                theme === 'indigo' ? 'bg-indigo-600' : 
-                                theme === 'emerald' ? 'bg-emerald-600' : 
-                                theme === 'amber' ? 'bg-amber-600' : 
-                                'bg-rose-600'
-                              } rounded-full`}></span>
-                            )}
+                    <Bell size={24} />
+                    {notifications.some(n => !n.read) && (
+                      <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                    )}
+                  </button>
+                  <div className="relative">
+                    <button 
+                      id="profile-button"
+                      onClick={() => setShowProfileMenu(!showProfileMenu)}
+                      className="flex items-center focus:outline-none"
+                    >
+                      <img 
+                        src={user.avatar} 
+                        alt={user.name} 
+                        className="h-8 w-8 rounded-full border-2 border-gray-200"
+                      />
+                    </button>
+
+                    {/* Profile Dropdown Menu */}
+                    <AnimatePresence>
+                      {showProfileMenu && (
+                        <motion.div
+                          ref={profileMenuRef}
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50"
+                        >
+                          <div className="px-4 py-2 border-b border-gray-100">
+                            <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                            <p className="text-xs text-gray-500">Level {user.level}</p>
                           </div>
-                          {!notification.read && (
+                          <div className="py-1">
                             <button
-                              onClick={() => markAsRead(notification.id)}
-                              className={`text-xs px-2 py-1 rounded ${
-                                theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
-                                theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
-                                theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
-                                'bg-rose-100 text-rose-600 hover:bg-rose-200'
-                              }`}
+                              onClick={() => {
+                                setActiveTab('settings');
+                                setShowProfileMenu(false);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             >
-                              Mark as Read
+                              <Settings size={16} className="mr-3" />
+                              Settings
                             </button>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
-                        <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
-                      </div>
-                    </div>
+                            <button
+                              onClick={() => {
+                                setActiveTab('analytics');
+                                setShowProfileMenu(false);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
+                              <BarChart2 size={16} className="mr-3" />
+                              Analytics
+                            </button>
+                            <button
+                              onClick={() => {
+                                setShowLogoutPopup(true);
+                                setShowProfileMenu(false);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >
+                              <LogOut size={16} className="mr-3" />
+                              Logout
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-                ))
-              )}
+                </div>
+              </div>
             </div>
-            {notifications.length > 0 && (
-              <div className="p-4 border-t border-gray-200">
+          </header>
+          
+          {/* Main Content */}
+          <main className="max-w-7xl mx-auto pb-20">
+            <AnimatePresence mode="wait">
+              {activeTab === 'dashboard' && renderDashboard()}
+              {activeTab === 'habits' && renderHabits()}
+              {activeTab === 'analytics' && renderAnalytics()}
+              {activeTab === 'settings' && renderSettings()}
+            </AnimatePresence>
+          </main>
+          
+          {/* Bottom Navigation */}
+          <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex justify-around">
                 <button 
-                  onClick={() => setNotifications([])}
-                  className={`w-full py-2 text-sm font-medium ${
-                    tempTheme === 'indigo' ? 'text-red-600 hover:text-red-800' : 
-                    tempTheme === 'emerald' ? 'text-red-600 hover:text-red-800' : 
-                    tempTheme === 'amber' ? 'text-red-600 hover:text-red-800' : 
-                    'text-red-600 hover:text-red-800'
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`flex flex-col items-center py-3 px-6 ${
+                    activeTab === 'dashboard' ? 
+                    (tempTheme === 'indigo' ? 'text-indigo-600' : 
+                     tempTheme === 'emerald' ? 'text-emerald-600' : 
+                     tempTheme === 'amber' ? 'text-amber-600' : 
+                     'text-rose-600') : 
+                    'text-gray-500'
                   }`}
                 >
-                  Delete all notifications
+                  <Home size={24} />
+                  <span className="text-xs mt-1">Home</span>
                 </button>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Add Habit Modal */}
-      <AnimatePresence>
-        {showAddHabit && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              ref={habitModalRef}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            >
-              <div className="flex justify-between items-center p-4 border-b">
-                <h2 className="text-xl font-bold">Add New Habit</h2>
                 <button 
-                  onClick={() => setShowAddHabit(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => setActiveTab('habits')}
+                  className={`flex flex-col items-center py-3 px-6 ${activeTab === 'habits' ? 'text-indigo-600' : 'text-gray-500'}`}
                 >
-                  <X size={24} />
+                  <CheckCircle size={24} />
+                  <span className="text-xs mt-1">Habits</span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('analytics')}
+                  className={`flex flex-col items-center py-3 px-6 ${activeTab === 'analytics' ? 'text-indigo-600' : 'text-gray-500'}`}
+                >
+                  <BarChart2 size={24} />
+                  <span className="text-xs mt-1">Analytics</span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('settings')}
+                  className={`flex flex-col items-center py-3 px-6 ${activeTab === 'settings' ? 'text-indigo-600' : 'text-gray-500'}`}
+                >
+                  <Settings size={24} />
+                  <span className="text-xs mt-1">Settings</span>
                 </button>
               </div>
-              
-              <form onSubmit={addNewHabit} className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-700 mb-1">Habit Name</label>
-                    <input 
-                      type="text" 
-                      name="name"
-                      required
-                      placeholder="e.g., Meditation"
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+            </div>
+          </nav>
+          
+          {/* Notifications Panel */}
+          <AnimatePresence>
+            {showNotifications && (
+              <motion.div 
+                ref={notificationRef}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-16 right-4 w-80 bg-white rounded-xl shadow-xl z-50 overflow-hidden"
+              >
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">Notifications</h3>
+                    <button 
+                      onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
+                      className={`text-sm ${
+                        tempTheme === 'indigo' ? 'text-indigo-600 hover:text-indigo-800' : 
+                        tempTheme === 'emerald' ? 'text-emerald-600 hover:text-emerald-800' : 
+                        tempTheme === 'amber' ? 'text-amber-600 hover:text-amber-800' : 
+                        'text-rose-600 hover:text-rose-800'
+                      }`}
+                    >
+                      Mark all as read
+                    </button>
+                  </div>
+                </div>
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <p className="text-gray-500 text-center py-6">No notifications</p>
+                  ) : (
+                    notifications.map(notification => (
+                      <div 
+                        key={notification.id}
+                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 ${
+                          !notification.read ? 
+                          (theme === 'indigo' ? 'bg-indigo-50' : 
+                           theme === 'emerald' ? 'bg-emerald-50' : 
+                           theme === 'amber' ? 'bg-amber-50' : 
+                           'bg-rose-50') : 
+                          ''
+                        }`}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium">{notification.title}</h4>
+                                {!notification.read && (
+                                  <span className={`h-2 w-2 ${
+                                    theme === 'indigo' ? 'bg-indigo-600' : 
+                                    theme === 'emerald' ? 'bg-emerald-600' : 
+                                    theme === 'amber' ? 'bg-amber-600' : 
+                                    'bg-rose-600'
+                                  } rounded-full`}></span>
+                                )}
+                              </div>
+                              {!notification.read && (
+                                <button
+                                  onClick={() => markAsRead(notification.id)}
+                                  className={`text-xs px-2 py-1 rounded ${
+                                    theme === 'indigo' ? 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200' : 
+                                    theme === 'emerald' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 
+                                    theme === 'amber' ? 'bg-amber-100 text-amber-600 hover:bg-amber-200' : 
+                                    'bg-rose-100 text-rose-600 hover:bg-rose-200'
+                                  }`}
+                                >
+                                  Mark as Read
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                            <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {notifications.length > 0 && (
+                  <div className="p-4 border-t border-gray-200">
+                    <button 
+                      onClick={() => setNotifications([])}
+                      className={`w-full py-2 text-sm font-medium ${
+                        tempTheme === 'indigo' ? 'text-red-600 hover:text-red-800' : 
+                        tempTheme === 'emerald' ? 'text-red-600 hover:text-red-800' : 
+                        tempTheme === 'amber' ? 'text-red-600 hover:text-red-800' : 
+                        'text-red-600 hover:text-red-800'
+                      }`}
+                    >
+                      Delete all notifications
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Add Habit Modal */}
+          <AnimatePresence>
+            {showAddHabit && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              >
+                <motion.div 
+                  ref={habitModalRef}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="bg-white rounded-xl shadow-xl w-full max-w-md"
+                >
+                  <div className="flex justify-between items-center p-4 border-b">
+                    <h2 className="text-xl font-bold">Add New Habit</h2>
+                    <button 
+                      onClick={() => setShowAddHabit(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <X size={24} />
+                    </button>
                   </div>
                   
-                  <div>
-                    <label className="block text-gray-700 mb-1">Icon (optional)</label>
-                    <input 
-                      type="text" 
-                      name="icon"
-                      placeholder="e.g., 🧘 (leave empty for default)"
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 mb-1">Target</label>
-                      <input 
-                        type="number" 
-                        name="target"
-                        required
-                        min="1"
-                        placeholder="e.g., 20"
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      />
+                  <form onSubmit={addNewHabit} className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-gray-700 mb-1">Habit Name</label>
+                        <input 
+                          type="text" 
+                          name="name"
+                          required
+                          placeholder="e.g., Meditation"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-gray-700 mb-1">Icon (optional)</label>
+                        <input 
+                          type="text" 
+                          name="icon"
+                          placeholder="e.g., 🧘 (leave empty for default)"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-700 mb-1">Target</label>
+                          <input 
+                            type="number" 
+                            name="target"
+                            required
+                            min="1"
+                            placeholder="e.g., 20"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-gray-700 mb-1">Unit</label>
+                          <input 
+                            type="text" 
+                            name="unit"
+                            required
+                            placeholder="e.g., minutes"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
+                      </div>
                     </div>
                     
-                    <div>
-                      <label className="block text-gray-700 mb-1">Unit</label>
-                      <input 
-                        type="text" 
-                        name="unit"
-                        required
-                        placeholder="e.g., minutes"
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      />
+                    <div className="mt-6 flex justify-end">
+                      <button 
+                        type="button"
+                        onClick={() => setShowAddHabit(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg mr-2 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      >
+                        Add Habit
+                      </button>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end">
-                  <button 
-                    type="button"
-                    onClick={() => setShowAddHabit(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg mr-2 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                  >
-                    Add Habit
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Add Reminder Modal */}
-      <AnimatePresence>
-        {showReminderModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              ref={reminderModalRef}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            >
-              <div className="flex justify-between items-center p-4 border-b">
-                <h2 className="text-xl font-bold">Add Reminder</h2>
-                <button 
-                  onClick={() => setShowReminderModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Add Reminder Modal */}
+          <AnimatePresence>
+            {showReminderModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              >
+                <motion.div 
+                  ref={reminderModalRef}
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="bg-white rounded-xl shadow-xl w-full max-w-md"
                 >
-                  <X size={24} />
-                </button>
-              </div>
-              
-              <form onSubmit={addReminder} className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-700 mb-1">Select Habit</label>
-                    <select 
-                      name="habitId"
-                      required
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      onChange={(e) => {
-                        const habit = habits.find(h => h.id === e.target.value);
-                        if (habit) setSelectedHabit(habit);
-                      }}
+                  <div className="flex justify-between items-center p-4 border-b">
+                    <h2 className="text-xl font-bold">Add Reminder</h2>
+                    <button 
+                      onClick={() => setShowReminderModal(false)}
+                      className="text-gray-500 hover:text-gray-700"
                     >
-                      <option value="">Select a habit</option>
-                      {habits.map(habit => (
-                        <option key={habit.id} value={habit.id}>
-                          {habit.name}
-                        </option>
-                      ))}
-                    </select>
+                      <X size={24} />
+                    </button>
                   </div>
                   
-                  <div>
-                    <label className="block text-gray-700 mb-1">Time</label>
-                    <input 
-                      type="time" 
-                      name="time"
-                      required
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end">
-                  <button 
-                    type="button"
-                    onClick={() => setShowReminderModal(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg mr-2 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit"
-                    className={`px-4 py-2 ${
-                      theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
-                      theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
-                      theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
-                      'bg-rose-600 hover:bg-rose-700'
-                    } text-white rounded-lg`}
-                  >
-                    Add Reminder
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Notification Popup */}
-      <AnimatePresence>
-        {showNotificationPopup && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
-          >
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-lg font-medium text-gray-900">Notifications Disabled</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  You have disabled all email notifications. The save button will be available in a few seconds.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Status Popup */}
-      <AnimatePresence>
-        {showStatusPopup && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
-          >
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-gray-500">
-                  {statusMessage}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Delete Account Popup */}
-      <AnimatePresence>
-        {showDeletePopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-lg font-medium text-gray-900">Delete Account</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Are you sure you want to delete your account? This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    onClick={() => setShowDeletePopup(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={deleteAccount}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                  >
-                    Delete Account
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Delete Habit Popup */}
-      <AnimatePresence>
-        {habitToDelete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 10 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden"
-            >
-              <div className="p-6">
+                  <form onSubmit={addReminder} className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-gray-700 mb-1">Select Habit</label>
+                        <select 
+                          name="habitId"
+                          required
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                          onChange={(e) => {
+                            const habit = habits.find(h => h.id === e.target.value);
+                            if (habit) setSelectedHabit(habit);
+                          }}
+                        >
+                          <option value="">Select a habit</option>
+                          {habits.map(habit => (
+                            <option key={habit.id} value={habit.id}>
+                              {habit.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-gray-700 mb-1">Time</label>
+                        <input 
+                          type="time" 
+                          name="time"
+                          required
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end">
+                      <button 
+                        type="button"
+                        onClick={() => setShowReminderModal(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg mr-2 hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        className={`px-4 py-2 ${
+                          theme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
+                          theme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
+                          theme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
+                          'bg-rose-600 hover:bg-rose-700'
+                        } text-white rounded-lg`}
+                      >
+                        Add Reminder
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Notification Popup */}
+          <AnimatePresence>
+            {showNotificationPopup && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
+              >
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center">
-                      <Trash2 className="h-5 w-5 text-red-500" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Delete Habit</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Are you sure you want to delete "{habitToDelete.name}"? This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    onClick={() => setHabitToDelete(null)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => deleteHabit(habitToDelete)}
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
-                  >
-                    Delete Habit
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Logout Popup */}
-      <AnimatePresence>
-        {showLogoutPopup && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-md"
-            >
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-lg font-medium text-gray-900">Logout</h3>
+                    <h3 className="text-lg font-medium text-gray-900">Notifications Disabled</h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      Are you sure you want to logout? Your session will be ended.
+                      You have disabled all email notifications. The save button will be available in a few seconds.
                     </p>
                   </div>
                 </div>
-                
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    onClick={() => setShowLogoutPopup(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={logout}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                  >
-                    Logout
-                  </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Status Popup */}
+          <AnimatePresence>
+            {showStatusPopup && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-50"
+              >
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-gray-500">
+                      {statusMessage}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Delete Account Popup */}
+          <AnimatePresence>
+            {showDeletePopup && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              >
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="bg-white rounded-xl shadow-xl w-full max-w-md"
+                >
+                  <div className="p-6">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-medium text-gray-900">Delete Account</h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Are you sure you want to delete your account? This action cannot be undone.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <button
+                        onClick={() => setShowDeletePopup(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={deleteAccount}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      >
+                        Delete Account
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Delete Habit Popup */}
+          <AnimatePresence>
+            {habitToDelete && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              >
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  className="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-red-50 flex items-center justify-center">
+                          <Trash2 className="h-5 w-5 text-red-500" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Delete Habit</h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Are you sure you want to delete "{habitToDelete.name}"? This action cannot be undone.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <button
+                        onClick={() => setHabitToDelete(null)}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => deleteHabit(habitToDelete)}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        Delete Habit
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Logout Popup */}
+          <AnimatePresence>
+            {showLogoutPopup && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              >
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  className="bg-white rounded-xl shadow-xl w-full max-w-md"
+                >
+                  <div className="p-6">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-lg font-medium text-gray-900">Logout</h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          Are you sure you want to logout? Your session will be ended.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <button
+                        onClick={() => setShowLogoutPopup(false)}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={logout}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-8">
+            <div>
+              <h3 className={`text-lg font-semibold ${
+                tempTheme === 'indigo' ? 'text-indigo-600' : 
+                tempTheme === 'emerald' ? 'text-emerald-600' : 
+                tempTheme === 'amber' ? 'text-amber-600' : 
+                'text-rose-600'
+              }`}>HabitTracker</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Build better habits, one day at a time. Track your progress and achieve your goals with our intuitive habit tracking app.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">Features</h4>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Habit Tracking</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Analytics</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Reminders</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Progress Reports</a>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">Resources</h4>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Help Center</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Blog</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Community</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">API</a>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-semibold text-gray-900">Company</h4>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">About Us</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Careers</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Terms of Service</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <div className="border-t border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p className="text-sm text-gray-500 text-center">
+              © {new Date().getFullYear()} HabitTracker. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
