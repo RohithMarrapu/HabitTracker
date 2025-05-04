@@ -284,11 +284,43 @@ const initialReminders: Reminder[] = [
 // Add new component before the main HabitTracker component
 const LandingPage = ({ 
   setActiveTab,
-  tempTheme = 'indigo' 
+  tempTheme = 'indigo',
+  setUser,
+  showNameDialog,
+  setShowNameDialog,
+  enteredName,
+  setEnteredName,
+  targetTab,
+  setTargetTab,
+  setTempName
 }: { 
   setActiveTab: (tab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing') => void;
   tempTheme?: Theme;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+  showNameDialog: boolean;
+  setShowNameDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  enteredName: string;
+  setEnteredName: React.Dispatch<React.SetStateAction<string>>;
+  targetTab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing';
+  setTargetTab: React.Dispatch<React.SetStateAction<'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing'>>;
+  setTempName: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+  const handleButtonClick = (tab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing') => {
+    setTargetTab(tab);
+    setShowNameDialog(true);
+  };
+
+  const handleNameSubmit = () => {
+    if (enteredName.trim()) {
+      const newName = enteredName.trim();
+      setUser(prev => ({...prev, name: newName}));
+      setTempName(newName);
+      setActiveTab(targetTab);
+      setShowNameDialog(false);
+      setEnteredName(''); // Clear the entered name after submission
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
@@ -311,7 +343,7 @@ const LandingPage = ({
           </h2>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => handleButtonClick('dashboard')}
               className={`px-8 py-3 ${
                 tempTheme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
                 tempTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
@@ -323,7 +355,7 @@ const LandingPage = ({
               <ArrowRight size={20} />
             </button>
             <button 
-              onClick={() => setActiveTab('analytics')}
+              onClick={() => handleButtonClick('analytics')}
               className="px-8 py-3 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-gray-300 flex items-center justify-center gap-2"
             >
               View Analytics
@@ -433,7 +465,7 @@ const LandingPage = ({
             Start your journey to a better you today with HabitTracker.
           </p>
           <button 
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => handleButtonClick('dashboard')}
             className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 mx-auto"
           >
             Get Started Now
@@ -441,6 +473,58 @@ const LandingPage = ({
           </button>
         </div>
       </div>
+
+      {/* Name Input Dialog */}
+      <AnimatePresence>
+        {showNameDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-xl shadow-xl w-full max-w-md"
+            >
+              <div className="p-6">
+                <h2 className="text-xl font-bold mb-4">Welcome to HabitTracker!</h2>
+                <p className="text-gray-600 mb-4">Please enter your name to get started:</p>
+                <input
+                  type="text"
+                  value={enteredName}
+                  onChange={(e) => setEnteredName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 mb-4"
+                />
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowNameDialog(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleNameSubmit}
+                    disabled={!enteredName.trim()}
+                    className={`px-4 py-2 ${
+                      !enteredName.trim() ? 'bg-gray-400 cursor-not-allowed' :
+                      tempTheme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
+                      tempTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
+                      tempTheme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
+                      'bg-rose-600 hover:bg-rose-700'
+                    } text-white rounded-lg`}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -464,7 +548,7 @@ export default function HabitTracker() {
   });
   const [theme, setTheme] = useState<Theme>('indigo');
   const [tempTheme, setTempTheme] = useState<Theme>(theme);
-  const [tempName, setTempName] = useState<string>(user.name);
+  const [tempName, setTempName] = useState<string>(initialUser.name);
   const [isSaveDisabled, setIsSaveDisabled] = useState<boolean>(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState<boolean>(false);
   const [notificationMessage, setNotificationMessage] = useState<string>('');
@@ -475,6 +559,9 @@ export default function HabitTracker() {
   const [habitToDelete, setHabitToDelete] = useState<Habit | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutPopup, setShowLogoutPopup] = useState<boolean>(false);
+  const [showNameDialog, setShowNameDialog] = useState(false);
+  const [enteredName, setEnteredName] = useState('');
+  const [targetTab, setTargetTab] = useState<'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing'>('landing');
   
   // Refs for click outside detection
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -1887,6 +1974,7 @@ export default function HabitTracker() {
   const handleSaveChanges = () => {
     setTheme(tempTheme);
     setUser(prev => ({...prev, name: tempName}));
+    setTempName(tempName); // Ensure tempName is in sync with the user's name
     
     // Check if there are any changes to email notifications
     const hasEmailChanges = emailNotifications.dailyDigest !== initialUser.emailNotifications.dailyDigest ||
@@ -1944,7 +2032,18 @@ export default function HabitTracker() {
   return (
     <div className="min-h-screen bg-gray-100">
       {activeTab === 'landing' ? (
-        <LandingPage setActiveTab={setActiveTab} tempTheme={tempTheme} />
+        <LandingPage 
+          setActiveTab={setActiveTab} 
+          tempTheme={theme} 
+          setUser={setUser}
+          showNameDialog={showNameDialog}
+          setShowNameDialog={setShowNameDialog}
+          enteredName={enteredName}
+          setEnteredName={setEnteredName}
+          targetTab={targetTab}
+          setTargetTab={setTargetTab}
+          setTempName={setTempName}
+        />
       ) : (
         <>
           {/* Header */}
