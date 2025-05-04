@@ -282,30 +282,49 @@ const initialReminders: Reminder[] = [
 ];
 
 // Add new component before the main HabitTracker component
-const LandingPage = ({ setActiveTab }: { setActiveTab: (tab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing') => void }) => {
+const LandingPage = ({ 
+  setActiveTab,
+  tempTheme = 'indigo' 
+}: { 
+  setActiveTab: (tab: 'dashboard' | 'habits' | 'analytics' | 'settings' | 'landing') => void;
+  tempTheme?: Theme;
+}) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 ${
+            tempTheme === 'indigo' ? 'text-indigo-600' : 
+            tempTheme === 'emerald' ? 'text-emerald-600' : 
+            tempTheme === 'amber' ? 'text-amber-600' : 
+            'text-rose-600'
+          }`}>HabitTracker</h1>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-8 max-w-2xl mx-auto">
             Build Better Habits,<br />
-            <span className="text-indigo-600">One Day at a Time</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Track your daily habits, monitor your progress, and achieve your goals with our intuitive habit tracking app.
-          </p>
-          <div className="flex justify-center gap-4">
+            <span className={`${
+              tempTheme === 'indigo' ? 'text-indigo-600' : 
+              tempTheme === 'emerald' ? 'text-emerald-600' : 
+              tempTheme === 'amber' ? 'text-amber-600' : 
+              'text-rose-600'
+            }`}>One Day at a Time</span>
+          </h2>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button 
               onClick={() => setActiveTab('dashboard')}
-              className="px-8 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+              className={`px-8 py-3 ${
+                tempTheme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 
+                tempTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : 
+                tempTheme === 'amber' ? 'bg-amber-600 hover:bg-amber-700' : 
+                'bg-rose-600 hover:bg-rose-700'
+              } text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2`}
             >
               Get Started
               <ArrowRight size={20} />
             </button>
             <button 
               onClick={() => setActiveTab('analytics')}
-              className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-indigo-600 flex items-center gap-2"
+              className="px-8 py-3 bg-white text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-gray-300 flex items-center justify-center gap-2"
             >
               View Analytics
               <BarChart2 size={20} />
@@ -315,10 +334,10 @@ const LandingPage = ({ setActiveTab }: { setActiveTab: (tab: 'dashboard' | 'habi
       </div>
 
       {/* Features Section */}
-      <div className="bg-white py-24">
+      <div className="bg-white py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Why Choose Our Habit Tracker?
+            Why Choose HabitTracker?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="p-6 bg-gray-50 rounded-xl">
@@ -353,10 +372,10 @@ const LandingPage = ({ setActiveTab }: { setActiveTab: (tab: 'dashboard' | 'habi
       </div>
 
       {/* How It Works Section */}
-      <div className="py-24">
+      <div className="py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How It Works
+            How HabitTracker Works
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -400,17 +419,22 @@ const LandingPage = ({ setActiveTab }: { setActiveTab: (tab: 'dashboard' | 'habi
       </div>
 
       {/* CTA Section */}
-      <div className="bg-indigo-600 py-16">
+      <div className={`py-16 ${
+        tempTheme === 'indigo' ? 'bg-indigo-600' : 
+        tempTheme === 'emerald' ? 'bg-emerald-600' : 
+        tempTheme === 'amber' ? 'bg-amber-600' : 
+        'bg-rose-600'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Build Better Habits?
           </h2>
           <p className="text-xl text-indigo-100 mb-8">
-            Start your journey to a better you today.
+            Start your journey to a better you today with HabitTracker.
           </p>
           <button 
             onClick={() => setActiveTab('dashboard')}
-            className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 mx-auto"
+            className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 mx-auto"
           >
             Get Started Now
             <ArrowRight size={20} />
@@ -1919,7 +1943,7 @@ export default function HabitTracker() {
   return (
     <div className="min-h-screen bg-gray-100">
       {activeTab === 'landing' ? (
-        <LandingPage setActiveTab={setActiveTab} />
+        <LandingPage setActiveTab={setActiveTab} tempTheme={tempTheme} />
       ) : (
         <>
           {/* Header */}
