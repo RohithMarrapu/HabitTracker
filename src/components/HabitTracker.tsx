@@ -2555,26 +2555,28 @@ export default function HabitTracker() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 py-8">
+            {/* Brand Section */}
+            <div className="text-center sm:text-left">
               <h3 className={`text-lg font-semibold ${
                 tempTheme === 'indigo' ? 'text-indigo-600' : 
                 tempTheme === 'emerald' ? 'text-emerald-600' : 
                 tempTheme === 'amber' ? 'text-amber-600' : 
                 'text-rose-600'
               }`}>HabitTracker</h3>
-              <p className="mt-2 text-sm text-gray-500">
+              <p className="mt-2 text-sm text-gray-500 max-w-xs mx-auto sm:mx-0">
                 Build better habits, one day at a time. Track your progress and achieve your goals with our intuitive habit tracking app.
               </p>
             </div>
             
-            <div>
+            {/* Quick Actions Section */}
+            <div className="text-center sm:text-left">
               <h4 className="text-sm font-semibold text-gray-900">Quick Actions</h4>
               <ul className="mt-4 space-y-2">
                 <li>
                   <button 
                     onClick={() => setActiveTab('habits')}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     View Habits
                   </button>
@@ -2582,7 +2584,7 @@ export default function HabitTracker() {
                 <li>
                   <button 
                     onClick={() => setActiveTab('analytics')}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     View Analytics
                   </button>
@@ -2590,7 +2592,7 @@ export default function HabitTracker() {
                 <li>
                   <button 
                     onClick={() => setActiveTab('settings')}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     Settings
                   </button>
@@ -2598,7 +2600,7 @@ export default function HabitTracker() {
                 <li>
                   <button 
                     onClick={() => setShowAddHabit(true)}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     Add New Habit
                   </button>
@@ -2606,7 +2608,8 @@ export default function HabitTracker() {
               </ul>
             </div>
             
-            <div>
+            {/* Account Section */}
+            <div className="text-center sm:text-left">
               <h4 className="text-sm font-semibold text-gray-900">Account</h4>
               <ul className="mt-4 space-y-2">
                 <li>
@@ -2615,7 +2618,7 @@ export default function HabitTracker() {
                       setActiveTab('settings');
                       setShowProfileMenu(false);
                     }}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     Profile Settings
                   </button>
@@ -2623,7 +2626,7 @@ export default function HabitTracker() {
                 <li>
                   <button 
                     onClick={exportData}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     Export Data
                   </button>
@@ -2631,7 +2634,7 @@ export default function HabitTracker() {
                 <li>
                   <button 
                     onClick={() => setShowLogoutPopup(true)}
-                    className="text-sm text-gray-500 hover:text-gray-900"
+                    className="text-sm text-gray-500 hover:text-gray-900 w-full sm:w-auto text-center sm:text-left"
                   >
                     Logout
                   </button>
