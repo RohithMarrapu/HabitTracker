@@ -519,185 +519,236 @@ export default function HabitTracker() {
   ];
   
   // Render Tabs
-  const renderDashboard = () => (
-    <div className="p-4 space-y-6">
-      {/* Welcome Card */}
-      <motion.div 
-        className={`${tempTheme === 'indigo' ? 'bg-indigo-600' : 
-                     tempTheme === 'emerald' ? 'bg-emerald-600' : 
-                     tempTheme === 'amber' ? 'bg-amber-600' : 
-                     'bg-rose-600'} text-white p-6 rounded-xl shadow-lg`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Welcome back, {user.name}!</h2>
-            <p className="text-indigo-100">
-              You're on a {user.streakDays} day streak. Keep it up!
-            </p>
-          </div>
-          <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center text-3xl">
-            🔥
-          </div>
-        </div>
-      </motion.div>
+  const renderDashboard = () => {
+    // Get today's date and last 7 days
+    const today = new Date();
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (6 - i));
+      return date.toISOString().split('T')[0];
+    });
+    
+    // Create weekly data with valid dates and realistic completion percentages
+    const weeklyData = last7Days.map(date => {
+      const existingData = analytics.overall.find(d => d.date === date);
+      if (existingData) return existingData;
       
-      {/* Daily Progress */}
-      <motion.div 
-        className="bg-white rounded-xl shadow-md p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <h3 className="text-lg font-semibold mb-4">Today's Progress</h3>
-        <div className="flex justify-between items-center mb-3">
-          <span className="text-gray-600">Overall Completion</span>
-          <span className="font-bold">{calculateOverallCompletion()}%</span>
-        </div>
-        <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className={`h-full ${
-              theme === 'indigo' ? 'bg-indigo-600' : 
-              theme === 'emerald' ? 'bg-emerald-600' : 
-              theme === 'amber' ? 'bg-amber-600' : 
-              'bg-rose-600'
-            }`}
-            style={{ width: `${calculateOverallCompletion()}%` }}
-          ></div>
-        </div>
+      // For today, use actual completion
+      if (date === today.toISOString().split('T')[0]) {
+        return {
+          date,
+          percentage: calculateOverallCompletion()
+        };
+      }
+      
+      // For previous days, calculate based on habit history
+      const dayCompletion = habits.reduce((total, habit) => {
+        const historyEntry = habit.history.find(h => h.date === date);
+        if (historyEntry) {
+          const completion = (historyEntry.value / habit.target) * 100;
+          return total + Math.min(100, completion);
+        }
+        return total;
+      }, 0);
+      
+      return {
+        date,
+        percentage: Math.round(dayCompletion / habits.length)
+      };
+    });
+
+    return (
+      <div className="p-4 space-y-6">
+        {/* Welcome Card */}
+        <motion.div 
+          className={`${tempTheme === 'indigo' ? 'bg-indigo-600' : 
+                       tempTheme === 'emerald' ? 'bg-emerald-600' : 
+                       tempTheme === 'amber' ? 'bg-amber-600' : 
+                       'bg-rose-600'} text-white p-6 rounded-xl shadow-lg`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Welcome back, {user.name}!</h2>
+              <p className="text-indigo-100">
+                You're on a {user.streakDays} day streak. Keep it up!
+              </p>
+            </div>
+            <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center text-3xl">
+              🔥
+            </div>
+          </div>
+        </motion.div>
         
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {habits.map((habit) => {
-            const completion = calculateCompletion(habit);
-            return (
-              <motion.div 
-                key={habit.id}
-                className="bg-gray-50 p-4 rounded-lg"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-2">{habit.icon}</span>
-                    <span className="font-medium">{habit.name}</span>
+        {/* Daily Progress */}
+        <motion.div 
+          className="bg-white rounded-xl shadow-md p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <h3 className="text-lg font-semibold mb-4">Today's Progress</h3>
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-gray-600">Overall Completion</span>
+            <span className="font-bold">{calculateOverallCompletion()}%</span>
+          </div>
+          <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className={`h-full ${
+                theme === 'indigo' ? 'bg-indigo-600' : 
+                theme === 'emerald' ? 'bg-emerald-600' : 
+                theme === 'amber' ? 'bg-amber-600' : 
+                'bg-rose-600'
+              }`}
+              style={{ width: `${calculateOverallCompletion()}%` }}
+            ></div>
+          </div>
+          
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {habits.map((habit) => {
+              const completion = calculateCompletion(habit);
+              return (
+                <motion.div 
+                  key={habit.id}
+                  className="bg-gray-50 p-4 rounded-lg"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-2">{habit.icon}</span>
+                      <span className="font-medium">{habit.name}</span>
+                    </div>
+                    <span className="text-sm font-semibold">{completion}%</span>
                   </div>
-                  <span className="text-sm font-semibold">{completion}%</span>
-                </div>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full ${getProgressColor(completion)}`}
-                    style={{ width: `${completion}%` }}
-                  ></div>
-                </div>
-                <div className="mt-2 flex justify-between text-sm text-gray-500">
-                  <span>Current: {habit.currentValue} {habit.unit}</span>
-                  <span>Target: {habit.target} {habit.unit}</span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
-      
-      {/* Weekly Overview */}
-      <motion.div 
-        className="bg-white rounded-xl shadow-md p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <h3 className="text-lg font-semibold mb-4">Weekly Overview</h3>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={analytics.overall}
-              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="percentage" 
-                name="Daily Completion %" 
-                stroke="#8884d8" 
-                activeDot={{ r: 8 }} 
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </motion.div>
-      
-      {/* Quick Actions */}
-      <motion.div 
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <button 
-          onClick={() => setActiveTab('habits')}
-          className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
-        >
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl mb-2">
-            <CheckCircle size={24} />
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${getProgressColor(completion)}`}
+                      style={{ width: `${completion}%` }}
+                    ></div>
+                  </div>
+                  <div className="mt-2 flex justify-between text-sm text-gray-500">
+                    <span>Current: {habit.currentValue} {habit.unit}</span>
+                    <span>Target: {habit.target} {habit.unit}</span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-          <span className="font-medium">Check In</span>
-        </button>
+        </motion.div>
         
-        <button 
-          onClick={() => setActiveTab('analytics')}
-          className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
+        {/* Weekly Overview */}
+        <motion.div 
+          className="bg-white rounded-xl shadow-md p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl mb-2">
-            <BarChart2 size={24} />
+          <h3 className="text-lg font-semibold mb-4">Weekly Overview</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={weeklyData}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(value: string) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString('en-US', { weekday: 'short' });
+                  }}
+                />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number) => [`${value}%`, 'Daily Completion']}
+                  labelFormatter={(label: string) => {
+                    const date = new Date(label);
+                    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="percentage" 
+                  name="Daily Completion %" 
+                  stroke="#8884d8" 
+                  activeDot={{ r: 8 }} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-          <span className="font-medium">Analytics</span>
-        </button>
+        </motion.div>
         
-        <button 
-          id="reminder-button"
-          onClick={() => setShowReminderModal(true)}
-          className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
+        {/* Quick Actions */}
+        <motion.div 
+          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl mb-2">
-            <Bell size={24} />
-          </div>
-          <span className="font-medium">Reminders</span>
-        </button>
-        
-        <button 
-          id="add-habit-button"
-          onClick={() => setShowAddHabit(true)}
-          className={`p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center ${
-            theme === 'indigo' ? 'bg-indigo-50 hover:bg-indigo-100' : 
-            theme === 'emerald' ? 'bg-emerald-50 hover:bg-emerald-100' : 
-            theme === 'amber' ? 'bg-amber-50 hover:bg-amber-100' : 
-            'bg-rose-50 hover:bg-rose-100'
-          }`}
-        >
-          <div className={`h-12 w-12 rounded-full ${
-            theme === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 
-            theme === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 
-            theme === 'amber' ? 'bg-amber-100 text-amber-600' : 
-            'bg-rose-100 text-rose-600'
-          } flex items-center justify-center text-xl mb-2`}>
-            <Plus size={24} />
-          </div>
-          <span className={`font-medium ${
-            theme === 'indigo' ? 'text-indigo-600' : 
-            theme === 'emerald' ? 'text-emerald-600' : 
-            theme === 'amber' ? 'text-amber-600' : 
-            'text-rose-600'
-          }`}>New Habit</span>
-        </button>
-      </motion.div>
-    </div>
-  );
+          <button 
+            onClick={() => setActiveTab('habits')}
+            className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
+          >
+            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl mb-2">
+              <CheckCircle size={24} />
+            </div>
+            <span className="font-medium">Check In</span>
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
+          >
+            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl mb-2">
+              <BarChart2 size={24} />
+            </div>
+            <span className="font-medium">Analytics</span>
+          </button>
+          
+          <button 
+            id="reminder-button"
+            onClick={() => setShowReminderModal(true)}
+            className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center"
+          >
+            <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl mb-2">
+              <Bell size={24} />
+            </div>
+            <span className="font-medium">Reminders</span>
+          </button>
+          
+          <button 
+            id="add-habit-button"
+            onClick={() => setShowAddHabit(true)}
+            className={`p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col items-center justify-center ${
+              theme === 'indigo' ? 'bg-indigo-50 hover:bg-indigo-100' : 
+              theme === 'emerald' ? 'bg-emerald-50 hover:bg-emerald-100' : 
+              theme === 'amber' ? 'bg-amber-50 hover:bg-amber-100' : 
+              'bg-rose-50 hover:bg-rose-100'
+            }`}
+          >
+            <div className={`h-12 w-12 rounded-full ${
+              theme === 'indigo' ? 'bg-indigo-100 text-indigo-600' : 
+              theme === 'emerald' ? 'bg-emerald-100 text-emerald-600' : 
+              theme === 'amber' ? 'bg-amber-100 text-amber-600' : 
+              'bg-rose-100 text-rose-600'
+            } flex items-center justify-center text-xl mb-2`}>
+              <Plus size={24} />
+            </div>
+            <span className={`font-medium ${
+              theme === 'indigo' ? 'text-indigo-600' : 
+              theme === 'emerald' ? 'text-emerald-600' : 
+              theme === 'amber' ? 'text-amber-600' : 
+              'text-rose-600'
+            }`}>New Habit</span>
+          </button>
+        </motion.div>
+      </div>
+    );
+  };
   
   const renderHabits = () => (
     <div className="p-4 space-y-6">
@@ -1058,201 +1109,252 @@ export default function HabitTracker() {
     </div>
   );
   
-  const renderAnalytics = () => (
-    <div className="p-4 space-y-6">
-      {/* Overall Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  const renderAnalytics = () => {
+    // Get today's date and last 7 days
+    const today = new Date();
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (6 - i));
+      return date.toISOString().split('T')[0];
+    });
+    
+    // Create overall data with valid dates and realistic completion percentages
+    const overallData = last7Days.map(date => {
+      const existingData = analytics.overall.find(d => d.date === date);
+      if (existingData) return existingData;
+      
+      // For today, use actual completion
+      if (date === today.toISOString().split('T')[0]) {
+        return {
+          date,
+          percentage: calculateOverallCompletion()
+        };
+      }
+      
+      // For previous days, calculate based on habit history
+      const dayCompletion = habits.reduce((total, habit) => {
+        const historyEntry = habit.history.find(h => h.date === date);
+        if (historyEntry) {
+          const completion = (historyEntry.value / habit.target) * 100;
+          return total + Math.min(100, completion);
+        }
+        return total;
+      }, 0);
+      
+      return {
+        date,
+        percentage: Math.round(dayCompletion / habits.length)
+      };
+    });
+
+    return (
+      <div className="p-4 space-y-6">
+        {/* Overall Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div 
+            className="bg-white p-5 rounded-xl shadow-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h3 className="text-gray-500 mb-1">Completion Rate</h3>
+            <p className="text-3xl font-bold">{calculateOverallCompletion()}%</p>
+            <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full ${
+                  theme === 'indigo' ? 'bg-indigo-600' : 
+                  theme === 'emerald' ? 'bg-emerald-600' : 
+                  theme === 'amber' ? 'bg-amber-600' : 
+                  'bg-rose-600'
+                }`}
+                style={{ width: `${calculateOverallCompletion()}%` }}
+              ></div>
+            </div>
+          </motion.div>
+          
+          <motion.div 
+            className="bg-white p-5 rounded-xl shadow-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <h3 className="text-gray-500 mb-1">Current Streak</h3>
+            <p className="text-3xl font-bold flex items-center">
+              {user.streakDays} days
+              <span className="text-2xl ml-2">🔥</span>
+            </p>
+            <p className="text-sm text-gray-500 mt-2">Best: 45 days</p>
+          </motion.div>
+          
+          <motion.div 
+            className="bg-white p-5 rounded-xl shadow-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            <h3 className="text-gray-500 mb-1">Total Habits</h3>
+            <p className="text-3xl font-bold">{habits.length}</p>
+            <p className="text-sm text-gray-500 mt-2">Active: {habits.length}</p>
+          </motion.div>
+          
+          <motion.div 
+            className="bg-white p-5 rounded-xl shadow-md"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.3 }}
+          >
+            <h3 className="text-gray-500 mb-1">This Week's Check-ins</h3>
+            <p className="text-3xl font-bold">
+              {habits.reduce((total: number, habit: Habit) => {
+                const today = new Date();
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return total + habit.history.filter(entry => new Date(entry.date) >= weekAgo).length;
+              }, 0)}
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Total: {habits.reduce((total: number, habit: Habit) => total + habit.history.length, 0)}
+            </p>
+          </motion.div>
+        </div>
+        
+        {/* Overall Progress */}
         <motion.div 
-          className="bg-white p-5 rounded-xl shadow-md"
+          className="bg-white rounded-xl shadow-md p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
         >
-          <h3 className="text-gray-500 mb-1">Completion Rate</h3>
-          <p className="text-3xl font-bold">{calculateOverallCompletion()}%</p>
-          <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className={`h-full ${
-                theme === 'indigo' ? 'bg-indigo-600' : 
-                theme === 'emerald' ? 'bg-emerald-600' : 
-                theme === 'amber' ? 'bg-amber-600' : 
-                'bg-rose-600'
-              }`}
-              style={{ width: `${calculateOverallCompletion()}%` }}
-            ></div>
+          <h3 className="text-lg font-semibold mb-4">Weekly Progress</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={overallData}
+                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tickFormatter={(value: string) => {
+                      const date = new Date(value);
+                      return date.toLocaleDateString('en-US', { weekday: 'short' });
+                    }}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value}%`, 'Overall Completion']}
+                    labelFormatter={(label: string) => {
+                      const date = new Date(label);
+                      return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="percentage" 
+                    name="Overall Completion" 
+                    stroke="#8884d8" 
+                    activeDot={{ r: 8 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={overallCompletionData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={false}
+                  >
+                    <Cell key="cell-0" fill="#8884d8" />
+                    <Cell key="cell-1" fill="#f1f5f9" />
+                  </Pie>
+                  <text
+                    x="50%"
+                    y="50%"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="text-2xl font-bold"
+                  >
+                    {calculateOverallCompletion()}%
+                  </text>
+                  <Tooltip formatter={(value) => `${value}%`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </motion.div>
         
+        {/* Individual Habit Stats */}
         <motion.div 
-          className="bg-white p-5 rounded-xl shadow-md"
+          className="bg-white rounded-xl shadow-md p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
         >
-          <h3 className="text-gray-500 mb-1">Current Streak</h3>
-          <p className="text-3xl font-bold flex items-center">
-            {user.streakDays} days
-            <span className="text-2xl ml-2">🔥</span>
-          </p>
-          <p className="text-sm text-gray-500 mt-2">Best: 45 days</p>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <h3 className="text-gray-500 mb-1">Total Habits</h3>
-          <p className="text-3xl font-bold">{habits.length}</p>
-          <p className="text-sm text-gray-500 mt-2">Active: {habits.length}</p>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-white p-5 rounded-xl shadow-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <h3 className="text-gray-500 mb-1">This Week's Check-ins</h3>
-          <p className="text-3xl font-bold">
-            {habits.reduce((total: number, habit: Habit) => {
-              const today = new Date();
-              const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-              return total + habit.history.filter(entry => new Date(entry.date) >= weekAgo).length;
-            }, 0)}
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Total: {habits.reduce((total: number, habit: Habit) => total + habit.history.length, 0)}
-          </p>
+          <h3 className="text-lg font-semibold mb-4">Habit Breakdown</h3>
+          <div className="space-y-6">
+            {habits.slice(0, showAllHabits ? habits.length : 2).map((habit) => (
+              <div key={habit.id}>
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-medium flex items-center">
+                    <span className="text-xl mr-2">{habit.icon}</span> {habit.name}
+                  </h4>
+                  <span className="text-sm text-gray-500">Target: {habit.target} {habit.unit}</span>
+                </div>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={habit.history}
+                      margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(value: string) => {
+                          const date = new Date(value);
+                          return date.toLocaleDateString('en-US', { weekday: 'short' });
+                        }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value: number) => [`${value} ${habit.unit}`, habit.name]}
+                        labelFormatter={(label: string) => {
+                          const date = new Date(label);
+                          return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                        }}
+                      />
+                      <Bar dataKey="value" name={habit.name} fill={habit.color} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ))}
+            {habits.length > 2 && (
+              <motion.button
+                onClick={() => setShowAllHabits(!showAllHabits)}
+                className={`w-full py-2 rounded-lg ${
+                  theme === 'indigo' ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 
+                  theme === 'emerald' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 
+                  theme === 'amber' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 
+                  'bg-rose-50 text-rose-600 hover:bg-rose-100'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {showAllHabits ? 'Show Less' : `Show More (${habits.length - 2} more)`}
+              </motion.button>
+            )}
+          </div>
         </motion.div>
       </div>
-      
-      {/* Overall Progress */}
-      <motion.div 
-        className="bg-white rounded-xl shadow-md p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-      >
-        <h3 className="text-lg font-semibold mb-4">Weekly Progress</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={analytics.overall}
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="percentage" 
-                  name="Overall Completion" 
-                  stroke="#8884d8" 
-                  activeDot={{ r: 8 }} 
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={overallCompletionData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={false}
-                >
-                  <Cell key="cell-0" fill="#8884d8" />
-                  <Cell key="cell-1" fill="#f1f5f9" />
-                </Pie>
-                <text
-                  x="50%"
-                  y="50%"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  className="text-2xl font-bold"
-                >
-                  {calculateOverallCompletion()}%
-                </text>
-                <Tooltip formatter={(value) => `${value}%`} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </motion.div>
-      
-      {/* Individual Habit Stats */}
-      <motion.div 
-        className="bg-white rounded-xl shadow-md p-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.5 }}
-      >
-        <h3 className="text-lg font-semibold mb-4">Habit Breakdown</h3>
-        <div className="space-y-6">
-          {habits.slice(0, showAllHabits ? habits.length : 2).map((habit) => (
-            <div key={habit.id}>
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium flex items-center">
-                  <span className="text-xl mr-2">{habit.icon}</span> {habit.name}
-                </h4>
-                <span className="text-sm text-gray-500">Target: {habit.target} {habit.unit}</span>
-              </div>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={habit.history}
-                    margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tickFormatter={(value: string) => {
-                        const date = new Date(value);
-                        return date.toLocaleDateString('en-US', { weekday: 'short' });
-                      }}
-                    />
-                    <YAxis />
-                    <Tooltip 
-                      formatter={(value: number) => [`${value} ${habit.unit}`, habit.name]}
-                      labelFormatter={(label: string) => {
-                        const date = new Date(label);
-                        return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-                      }}
-                    />
-                    <Bar dataKey="value" name={habit.name} fill={habit.color} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          ))}
-          {habits.length > 2 && (
-            <motion.button
-              onClick={() => setShowAllHabits(!showAllHabits)}
-              className={`w-full py-2 rounded-lg ${
-                theme === 'indigo' ? 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100' : 
-                theme === 'emerald' ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 
-                theme === 'amber' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 
-                'bg-rose-50 text-rose-600 hover:bg-rose-100'
-              }`}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {showAllHabits ? 'Show Less' : `Show More (${habits.length - 2} more)`}
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
-    </div>
-  );
+    );
+  };
   
   const renderSettings = () => (
     <div className="p-4 space-y-6">
