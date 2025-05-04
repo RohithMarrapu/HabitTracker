@@ -2555,7 +2555,7 @@ export default function HabitTracker() {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8">
             <div>
               <h3 className={`text-lg font-semibold ${
                 tempTheme === 'indigo' ? 'text-indigo-600' : 
@@ -2569,55 +2569,72 @@ export default function HabitTracker() {
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold text-gray-900">Features</h4>
+              <h4 className="text-sm font-semibold text-gray-900">Quick Actions</h4>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Habit Tracking</a>
+                  <button 
+                    onClick={() => setActiveTab('habits')}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    View Habits
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Analytics</a>
+                  <button 
+                    onClick={() => setActiveTab('analytics')}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    View Analytics
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Reminders</a>
+                  <button 
+                    onClick={() => setActiveTab('settings')}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    Settings
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Progress Reports</a>
+                  <button 
+                    onClick={() => setShowAddHabit(true)}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    Add New Habit
+                  </button>
                 </li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-sm font-semibold text-gray-900">Resources</h4>
+              <h4 className="text-sm font-semibold text-gray-900">Account</h4>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Help Center</a>
+                  <button 
+                    onClick={() => {
+                      setActiveTab('settings');
+                      setShowProfileMenu(false);
+                    }}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    Profile Settings
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Blog</a>
+                  <button 
+                    onClick={exportData}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    Export Data
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Community</a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">API</a>
-                </li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900">Company</h4>
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">About Us</a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Careers</a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Privacy Policy</a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Terms of Service</a>
+                  <button 
+                    onClick={() => setShowLogoutPopup(true)}
+                    className="text-sm text-gray-500 hover:text-gray-900"
+                  >
+                    Logout
+                  </button>
                 </li>
               </ul>
             </div>
