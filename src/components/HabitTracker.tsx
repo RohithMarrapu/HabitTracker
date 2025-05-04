@@ -662,6 +662,7 @@ export default function HabitTracker() {
   const deleteHabit = (habit: Habit) => {
     setHabits(prevHabits => prevHabits.filter(h => h.id !== habit.id));
     setHabitToDelete(null);
+    setSelectedHabit(null); // Add this line to clear the selected habit
     
     // Add notification
     const newNotification: Notification = {
@@ -965,7 +966,7 @@ export default function HabitTracker() {
             </button>
             <h2 className="text-xl font-bold">{selectedHabit.icon} {selectedHabit.name}</h2>
             <button 
-              onClick={() => deleteHabit(selectedHabit)}
+              onClick={() => setHabitToDelete(selectedHabit)}
               className="text-red-500 hover:text-red-700"
             >
               <Trash2 size={24} />
